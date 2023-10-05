@@ -9,6 +9,7 @@ from sklearn.linear_model import LinearRegression, Lasso    # classes providing 
 from sklearn.metrics import mean_squared_error    # function to calculate mean squared error 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPRegressor
 
 #data read and processing
 df = pd.read_csv('Vuokraovi_21_9.csv')
@@ -44,8 +45,8 @@ scaler = StandardScaler()
 X = scaler.fit_transform(X)
 
 #splitting into testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state = 42)
+X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state = 42)
 
 
 degrees = [3]  # degrees to fit
@@ -74,13 +75,14 @@ for i in degrees:    #fit regression for chosen degrees
     tr_error = mean_squared_error(y_test, y_pred)
 
     print("\ntraining error: \n",tr_error)
+    print(np.median(np.absolute(y_test - y_pred)))
     print("\n\n")
  
-from sklearn.neural_network import MLPRegressor
+
 
 ## define a list of values for the number of hidden layers
 num_layers = [1,2,4,6,8,10]    # number of hidden layers
-num_neurons = 10  # number of neurons in each layer
+num_neurons = 50  # number of neurons in each layer
 
 # we will use this variable to store the resulting training errors corresponding to different hidden-layer numbers
 mlp_tr_errors = []          
@@ -112,6 +114,7 @@ for i, num in enumerate(num_layers):
     print(tr_error_mlp)
     print(val_error_mlp)
     
+    print(np.median(np.absolute(y_test - y_pred_test_mlp)))
     
 
     mlp_tr_errors.append(tr_error_mlp)
