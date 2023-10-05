@@ -76,3 +76,62 @@ for i in degrees:    #fit regression for chosen degrees
     print("\ntraining error: \n",tr_error)
     print("\n\n")
  
+from sklearn.neural_network import MLPRegressor
+
+## define a list of values for the number of hidden layers
+num_layers = [1,2,4,6,8,10]    # number of hidden layers
+num_neurons = 10  # number of neurons in each layer
+
+# we will use this variable to store the resulting training errors corresponding to different hidden-layer numbers
+mlp_tr_errors = []          
+mlp_val_errors = []
+
+for i, num in enumerate(num_layers):
+    hidden_layer_sizes = tuple([num_neurons]*num) # size (num of neurons) of each layer stacked in a tuple
+    
+    
+    # YOUR CODE HERE
+    mlp_regr = MLPRegressor()
+    mlp_regr.hidden_layer_sizes = hidden_layer_sizes
+    mlp_regr.max_iter = 10000
+    mlp_regr.random_state = 42
+    
+    mlp_regr.fit(X_train, y_train)
+    
+    ## evaluate the trained MLP on both training set and validation set
+    y_pred_train_mlp = mlp_regr.predict(X_train)    # predict on the training set
+    tr_error_mlp = mean_squared_error(y_train, y_pred_train_mlp)    # calculate the training error
+    y_pred_test_mlp = mlp_regr.predict(X_test) # predict values for the validation data 
+    val_error_mlp = mean_squared_error(y_test, y_pred_test_mlp) # calculate the validation error
+    
+    # sanity check num of layers
+    # assert mlp_regr.n_layers_ == num_layers[i]+2 # total layers = num of hidden layers + input layer + output layer
+    # # sanity check the error values
+    # assert 3 < tr_error < 4 and 5 < val_error < 6
+    print("number of layers: ", num)
+    print(tr_error_mlp)
+    print(val_error_mlp)
+    
+    
+
+    mlp_tr_errors.append(tr_error_mlp)
+    mlp_val_errors.append(val_error_mlp)
+
+plt.figure(figsize=(8, 6))
+
+plt.plot(num_layers, mlp_tr_errors, label = 'Train')
+plt.plot(num_layers, mlp_val_errors,label = 'Valid')
+plt.xticks(num_layers)
+plt.legend(loc = 'upper left')
+
+plt.xlabel('Layers')
+plt.ylabel('Loss')
+plt.title('Train vs validation loss')
+plt.show()
+
+
+
+
+
+
+
