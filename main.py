@@ -54,6 +54,7 @@ def cnn():
     mlp_val_errors = []
     mlp_test_errors = []
 
+    mlp_tr_median = []
     mlp_val_median = []
     mlp_test_median = []
 
@@ -97,6 +98,7 @@ def cnn():
         f.write("\n\n\n")
 
         mlp_tr_errors.append(tr_error_mlp)
+        mlp_tr_median.append(tr_median_mlp)
 
         mlp_val_errors.append(val_error_mlp)
         mlp_val_median.append(val_median_mlp)
@@ -104,16 +106,25 @@ def cnn():
         mlp_test_errors.append(test_error_mlp)
         mlp_test_median.append(test_median_mlp)
 
-    plt.figure(figsize=(8, 6))
+    figure, axis = plt.subplots(2)
+    figure.tight_layout()
 
-    plt.plot(num_layers, mlp_tr_errors, label = 'Train')
-    plt.plot(num_layers, mlp_val_errors,label = 'Valid')
-    plt.xticks(num_layers)
-    plt.legend(loc = 'upper left')
+    axis[0].plot(num_layers, mlp_tr_errors, label = 'Train')
+    axis[1].plot(num_layers, mlp_tr_median, label = 'Train')
 
-    plt.xlabel('Layers')
-    plt.ylabel('Loss')
-    plt.title('Train vs validation loss')
+    axis[0].plot(num_layers, mlp_val_errors,label = 'Valid')
+    axis[1].plot(num_layers, mlp_val_median, label = 'Train')
+
+    axis[0].set_xticks(num_layers)
+    axis[1].set_xticks(num_layers)
+    axis[0].set_xlabel('Layers')
+    axis[1].set_xlabel('Layers')
+    axis[0].set_ylabel('Loss')
+    axis[1].set_ylabel('Loss')
+    axis[0].set_title('Train vs validation loss')
+    axis[1].set_title('Train vs validation median')
+
+    plt.legend(loc='upper center')
     plt.show()
 
 
