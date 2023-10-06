@@ -96,67 +96,85 @@ def cnn():
     #Open a file where to store the results
     f = open("CnnResults.txt", "w")
     ## define a list of values for the number of hidden layers
-    num_layers = range(1, int(input("Until how many hidden layers?: \n")) + 1)    # number of hidden layers
-    num_neurons = int(input("\nHow many neurons per layer?: \n")) # number of neurons in each layer
+    num_layers = range(int(input("\nStarting number of hidden layers?: \n")), int(input("Max amount of hidden layers?: \n")) + 1)    # number of hidden layers
+    list_of_num_neurons = range(int(input("\nStarting number of neurons?: \n")), int(input("\nMax amount of neurons?:\n")) + 1, int(input("\nJump between neuron amounts?: \n"))) # number of neurons in each layer
 
-    # Store errors for future plotting
-    mlp_tr_errors = []          
-    mlp_val_errors = []
-    mlp_test_errors = []
+    # Store errors for future plotting       
+    mlp_val_errors = [[] for _ in list_of_num_neurons]
+    mlp_test_errors = [[] for _ in list_of_num_neurons]
 
-    mlp_tr_median = []
-    mlp_val_median = []
-    mlp_test_median = []
+    mlp_val_medians = [[] for _ in list_of_num_neurons]
+    mlp_test_medians = [[] for _ in list_of_num_neurons]
+    for i, num_neurons in enumerate(list_of_num_neurons):
+        print(num_neurons)
+        for j, num in enumerate(num_layers):
+            #hidden_layer_sizes = tuple([num_neurons]*num) # size (num of neurons) of each layer stacked in a tuple
+            hidden_layer_sizes = tuple([num_neurons]*num)
+            
+            
+            # Mlp_regression conf
+            mlp_regr = MLPRegressor()
+            mlp_regr.hidden_layer_sizes = hidden_layer_sizes
+            mlp_regr.max_iter = 100000
+            mlp_regr.random_state = 42
+            
+            mlp_regr.fit(X_train, y_train)
+            
+            ## evaluate the trained MLP on training, validation and test sets
+            y_pred_train_mlp = mlp_regr.predict(X_train)    # predict on the training set
+            tr_error_mlp = mean_squared_error(y_train, y_pred_train_mlp)    # calculate the training error
+            tr_median_mlp = np.median(np.absolute(y_train - y_pred_train_mlp))
 
-    for i, num in enumerate(num_layers):
-        #hidden_layer_sizes = tuple([num_neurons]*num) # size (num of neurons) of each layer stacked in a tuple
-        hidden_layer_sizes = tuple([num_neurons]*num)
-        
-        
-        # Mlp_regression conf
-        mlp_regr = MLPRegressor()
-        mlp_regr.hidden_layer_sizes = hidden_layer_sizes
-        mlp_regr.max_iter = 10000
-        mlp_regr.random_state = 42
-        
-        mlp_regr.fit(X_train, y_train)
-        
-        ## evaluate the trained MLP on training, validation and test sets
-        y_pred_train_mlp = mlp_regr.predict(X_train)    # predict on the training set
-        tr_error_mlp = mean_squared_error(y_train, y_pred_train_mlp)    # calculate the training error
-        tr_median_mlp = np.median(np.absolute(y_train - y_pred_train_mlp))
+            y_pred_val_mlp = mlp_regr.predict(X_val) # predict values for the validation data 
+            val_error_mlp = mean_squared_error(y_val, y_pred_val_mlp) # calculate the validation error
+            val_median_mlp = np.median(np.absolute(y_val - y_pred_val_mlp))
 
-        y_pred_val_mlp = mlp_regr.predict(X_val) # predict values for the validation data 
-        val_error_mlp = mean_squared_error(y_val, y_pred_val_mlp) # calculate the validation error
-        val_median_mlp = np.median(np.absolute(y_val - y_pred_val_mlp))
+            y_pred_test_mlp = mlp_regr.predict(X_test) # predict values for the test data 
+            test_error_mlp = mean_squared_error(y_test, y_pred_test_mlp) # calculate the test error
+            test_median_mlp = np.median(np.absolute(y_test - y_pred_test_mlp))
+            
+            # Write the data to a file for later inspection
+            f.write("number of layers|Neurons: {}|{}".format(num, num_neurons))
+            f.write("\n\nMean error:\n")
+            f.write(str(tr_error_mlp) + "\n")
+            f.write(str(val_error_mlp))
+            f.write("\n\nMedian error:\n")
+            f.write(str(tr_median_mlp) + "\n")
+            f.write(str(val_median_mlp))
+            f.write("\n\n\n")
 
-        y_pred_test_mlp = mlp_regr.predict(X_test) # predict values for the test data 
-        test_error_mlp = mean_squared_error(y_test, y_pred_test_mlp) # calculate the test error
-        test_median_mlp = np.median(np.absolute(y_test - y_pred_test_mlp))
-        
-        # Write the data to a file for later inspection
-        f.write("number of layers: {}".format(num))
-        f.write("\n\nMean error:\n")
-        f.write(str(tr_error_mlp) + "\n")
-        f.write(str(val_error_mlp))
-        f.write("\n\nMedian error:\n")
-        f.write(str(tr_median_mlp) + "\n")
-        f.write(str(val_median_mlp))
-        f.write("\n\n\n")
+            #Keep track of every error type for later plotting
+            mlp_val_errors[i].append(val_error_mlp)
+            mlp_val_medians[i].append(val_median_mlp)
 
-        #Keep track of every error type for later plotting
-        mlp_tr_errors.append(tr_error_mlp)
-        mlp_tr_median.append(tr_median_mlp)
+            mlp_test_errors[i].append(test_error_mlp)
+            mlp_test_medians[i].append(test_median_mlp)
 
-        mlp_val_errors.append(val_error_mlp)
-        mlp_val_median.append(val_median_mlp)
+    #Reverse plots y axis
+    [i.reverse() for i in mlp_val_errors]
+    [i.reverse() for i in mlp_val_medians]
 
-        mlp_test_errors.append(test_error_mlp)
-        mlp_test_median.append(test_median_mlp)
+    fig, axes = plt.subplots(1, 2)
+    fig.subplots_adjust(left  = 0.125, right = 0.9, bottom = 0.1, top = 0.9, wspace = 0.4, hspace = 0.6)
 
+    sns.heatmap(mlp_val_errors, annot=True, fmt='g', ax=axes[0], norm=LogNorm())
+    axes[0].set_xlabel('layers',fontsize=8)
+    axes[0].set_ylabel('Neurons/layer',fontsize=8)
+    axes[0].set_title('Mean',fontsize=15)
+    axes[0].xaxis.set_ticklabels(num_layers,fontsize=8)
+    axes[0].yaxis.set_ticklabels(reversed(list_of_num_neurons),fontsize=8)
+
+    sns.heatmap(mlp_val_medians, annot=True, fmt='g', ax=axes[1], norm=LogNorm())
+    axes[1].set_xlabel('layers',fontsize=8)
+    axes[1].set_ylabel('Neurons/layer',fontsize=8)
+    axes[1].set_title('Median',fontsize=15)
+    axes[1].xaxis.set_ticklabels(num_layers,fontsize=8)
+    axes[1].yaxis.set_ticklabels(reversed(list_of_num_neurons),fontsize=8)
+
+    plt.show()
 
     #Make a plot from the generated error values 
-    figure, axis = plt.subplots(2)
+    '''figure, axis = plt.subplots(2)
     figure.tight_layout()
 
     axis[0].plot(num_layers, mlp_tr_errors, label = 'Train')
@@ -177,7 +195,7 @@ def cnn():
     axis[0].set_title('Train vs validation loss')
     axis[1].set_title('Train vs validation median')
 
-    plt.show()
+    plt.show()'''
 
 
 def main():
