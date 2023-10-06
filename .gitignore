@@ -2,3 +2,5 @@ env/
 __pycache__/
 googleAPI.py
 Results.txt
+LinearResults.txt
+Cnnresults.txt
