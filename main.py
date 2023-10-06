@@ -98,6 +98,7 @@ def cnn():
     ## define a list of values for the number of hidden layers
     num_layers = range(int(input("\nStarting number of hidden layers?: \n")), int(input("Max amount of hidden layers?: \n")) + 1)    # number of hidden layers
     list_of_num_neurons = range(int(input("\nStarting number of neurons?: \n")), int(input("\nMax amount of neurons?:\n")) + 1, int(input("\nJump between neuron amounts?: \n"))) # number of neurons in each layer
+    print("\n\n\n amount of cycles: {}".format(len(list_of_num_neurons)))
 
     # Store errors for future plotting       
     mlp_val_errors = [[] for _ in list_of_num_neurons]
@@ -106,7 +107,7 @@ def cnn():
     mlp_val_medians = [[] for _ in list_of_num_neurons]
     mlp_test_medians = [[] for _ in list_of_num_neurons]
     for i, num_neurons in enumerate(list_of_num_neurons):
-        print(num_neurons)
+        print(str(i + 1))
         for j, num in enumerate(num_layers):
             #hidden_layer_sizes = tuple([num_neurons]*num) # size (num of neurons) of each layer stacked in a tuple
             hidden_layer_sizes = tuple([num_neurons]*num)
@@ -151,8 +152,8 @@ def cnn():
             mlp_test_medians[i].append(test_median_mlp)
 
     #Reverse plots y axis
-    [i.reverse() for i in mlp_val_errors]
-    [i.reverse() for i in mlp_val_medians]
+    mlp_val_errors.reverse()
+    mlp_val_medians.reverse()
 
     fig, axes = plt.subplots(1, 2)
     fig.subplots_adjust(left  = 0.125, right = 0.9, bottom = 0.1, top = 0.9, wspace = 0.4, hspace = 0.6)
@@ -173,30 +174,18 @@ def cnn():
 
     plt.show()
 
-    #Make a plot from the generated error values 
-    '''figure, axis = plt.subplots(2)
-    figure.tight_layout()
+    inp1 = input("\nNeuron amount of your favorite cell?:\n")
+    inp2 = input("\nLayer amount of your favorite cell?:\n")
 
-    axis[0].plot(num_layers, mlp_tr_errors, label = 'Train')
-    axis[1].plot(num_layers, mlp_tr_median, label = 'Train')
-
-    axis[0].plot(num_layers, mlp_val_errors,label = 'Valid')
-    axis[1].plot(num_layers, mlp_val_median, label = 'Valid')
-    
-    axis[0].legend(loc="upper right")
-    axis[1].legend(loc="upper right")
-
-    axis[0].set_xticks(num_layers)
-    axis[1].set_xticks(num_layers)
-    axis[0].set_xlabel('Layers')
-    axis[1].set_xlabel('Layers')
-    axis[0].set_ylabel('Loss')
-    axis[1].set_ylabel('Loss')
-    axis[0].set_title('Train vs validation loss')
-    axis[1].set_title('Train vs validation median')
-
-    plt.show()'''
-
+    f.write("\n\nAll test means:\n")
+    f.write(str(mlp_test_errors))
+    f.write("\nAll test medians:\n")
+    f.write(str(mlp_test_medians))
+    f.write("\n\n\nChosen cell was neurons|layers: {}|{}".format(inp1, inp2))
+    f.write("\n\nMean error:")
+    f.write(str(np.sqrt(mlp_test_errors[list_of_num_neurons.index(int(inp1))][num_layers.index(int(inp2))])))
+    f.write("\nMedian error:")
+    f.write(str(mlp_test_medians[list_of_num_neurons.index(int(inp1))][num_layers.index(int(inp2))]))
 
 def main():
     choice = int(input("1 = Lin, 2 = Cnn: \n"))
