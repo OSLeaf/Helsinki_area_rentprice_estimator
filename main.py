@@ -98,7 +98,7 @@ def cnn():
     ## define a list of values for the number of hidden layers
     num_layers = range(int(input("\nStarting number of hidden layers?: \n")), int(input("Max amount of hidden layers?: \n")) + 1)    # number of hidden layers
     list_of_num_neurons = range(int(input("\nStarting number of neurons?: \n")), int(input("\nMax amount of neurons?:\n")) + 1, int(input("\nJump between neuron amounts?: \n"))) # number of neurons in each layer
-    print("\n\n\n amount of cycles: {}".format(len(list_of_num_neurons)))
+    print("\n\nAmount of cycles: {}".format(len(list_of_num_neurons)))
 
     # Store errors for future plotting       
     mlp_val_errors = [[] for _ in list_of_num_neurons]
