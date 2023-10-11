@@ -4,9 +4,12 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
+
+scaler = StandardScaler()
+
 def get_X_y():
     '''
-    Reads a hardcoded file and preprosesses it to X with features and y with labels.
+    Reads a hardcoded file and preprosesses it to X with features and y with labels. End result = [x-coord, y-coord, number_of_rooms, sauna, building_year, squaremeters]
     '''
     df = pd.read_csv('Vuokraovi_21_9.csv')
     df = df.assign(Sqm = pd.Series(map(lambda s: float(s.split()[0].replace(",", ".")), df['m^2'].astype(str))))
@@ -37,7 +40,6 @@ def get_X_y():
     y = np.array(labels)
 
     #Scaling features
-    scaler = StandardScaler()
     X = scaler.fit_transform(X)
     return X, y
 
@@ -50,3 +52,7 @@ def get_train_test_vald():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state = 42)
     X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state = 42)
     return X_train, y_train, X_test, y_test, X_val, y_val
+
+def transfrom_user_input(X):
+    X = scaler.transform(X)
+    return X

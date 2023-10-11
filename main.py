@@ -12,7 +12,7 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.decomposition import PCA
 
 #Import the Preprosessing file
-from Preprosessing import get_train_test_vald
+from Preprosessing import get_train_test_vald, transfrom_user_input
 
 #Get features and labels
 X_train, y_train, X_test, y_test, X_val, y_val = get_train_test_vald()
@@ -186,6 +186,11 @@ def cnn():
     f.write(str(np.sqrt(mlp_test_errors[list_of_num_neurons.index(int(inp1))][num_layers.index(int(inp2))])))
     f.write("\nMedian error:")
     f.write(str(mlp_test_medians[list_of_num_neurons.index(int(inp1))][num_layers.index(int(inp2))]))
+
+    Own_prediction_mlp = MLPRegressor([int(inp1)]*int(inp2), max_iter= 100000, random_state=42).fit(X_train, y_train)
+
+    for line in np.loadtxt("Own_prediction.txt", dtype=float):
+        print(Own_prediction_mlp.predict(transfrom_user_input(np.array(line).reshape(1, -1))))
 
 def main():
     choice = int(input("1 = Lin, 2 = Cnn: \n"))

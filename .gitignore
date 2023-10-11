@@ -5,3 +5,5 @@ Results.txt
 LinearResults.txt
 Cnnresults.txt
 Cnn_heatmap.png
+Linear_heatmap.png
+Own_predictions.txt
