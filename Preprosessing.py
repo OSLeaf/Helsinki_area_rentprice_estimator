@@ -11,7 +11,7 @@ def get_X_y():
     '''
     Reads a hardcoded file and preprosesses it to X with features and y with labels. End result = [x-coord, y-coord, number_of_rooms, sauna, building_year, squaremeters]
     '''
-    df = pd.read_csv('Vuokraovi_21_9.csv')
+    df = pd.read_csv('Vuokraovi.csv')
     df = df.assign(Sqm = pd.Series(map(lambda s: float(s.split()[0].replace(",", ".")), df['m^2'].astype(str))))
     df = df.assign(PriceE = pd.Series(map(lambda s: float(s.split("€")[0].replace(",", ".").replace("\xa0", "")), df['Price'].astype(str))))
     df = df.drop(['Place', 'Rooms', 'm^2', 'Price'], axis = 1)

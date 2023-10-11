@@ -16,7 +16,6 @@ from Preprosessing import get_train_test_vald, transfrom_user_input
 
 #Get features and labels
 X_train, y_train, X_test, y_test, X_val, y_val = get_train_test_vald()
-f = open("Results.txt", "w")
 
 
 def lin():
@@ -34,6 +33,10 @@ def lin():
     lin_test_errors = []
     lin_test_medians = []
 
+    #Store training errors:
+    lin_train_errors = []
+    lin_train_medians = []
+
     degrees = range(0, int(input("Until which degree?: \n")) + 1)
 
     for i in degrees:    #fit regression for chosen degrees
@@ -47,6 +50,7 @@ def lin():
         lin_regr = LinearRegression(fit_intercept=False)
         lin_regr.fit(X_train_poly, y_train)
         #predict testing values
+        y_train_pred = lin_regr.predict(X_train_poly)
         y_pred = lin_regr.predict(X_val_poly)
         y_test_pred = lin_regr.predict(X_test_poly)
 
@@ -55,6 +59,9 @@ def lin():
         y_pred = linlasso.predict(X_test_poly)'''
 
         #calculating error
+        train_error = mean_squared_error(y_train, y_train_pred)
+        train_median = np.median(np.absolute(y_train - y_train_pred))
+
         val_error = mean_squared_error(y_val, y_pred)
         val_median = np.median(np.absolute(y_val - y_pred))
 
@@ -65,12 +72,15 @@ def lin():
         lin_val_medians.append(val_median)
         lin_test_errors.append(test_error)
         lin_test_medians.append(test_median)
+        lin_train_errors.append(train_error)
+        lin_train_medians.append(train_median)
 
         #Write the results for a later inspection
         f.write("Polynomial degree = {}".format(i))
-        f.write("\nMean error: \n {} \n".format(val_error))
-        f.write("Median error: \n {} \n\n".format(val_median))
+        f.write("\nMean error: \n train: {} \n validation: {} \n".format(train_error, val_error))
+        f.write("Median error: \n train: {} \n validation: {} \n\n".format(train_median, val_median))
 
+    #Plottig the errors to a heatmap
     fig, axes= plt.subplots(2, 1)
     fig.subplots_adjust(left  = 0.125, right = 0.9, bottom = 0.1, top = 0.9, wspace = 0.2, hspace = 0.6)
 
@@ -155,6 +165,7 @@ def cnn():
     mlp_val_errors.reverse()
     mlp_val_medians.reverse()
 
+    #Plot the errors to a headmap
     fig, axes = plt.subplots(1, 2)
     fig.subplots_adjust(left  = 0.125, right = 0.9, bottom = 0.1, top = 0.9, wspace = 0.4, hspace = 0.6)
 
@@ -174,6 +185,7 @@ def cnn():
 
     plt.show()
 
+    #Choose the best parameters and get test errors for those.
     inp1 = input("\nNeuron amount of your favorite cell?:\n")
     inp2 = input("\nLayer amount of your favorite cell?:\n")
 
@@ -187,6 +199,7 @@ def cnn():
     f.write("\nMedian error:")
     f.write(str(mlp_test_medians[list_of_num_neurons.index(int(inp1))][num_layers.index(int(inp2))]))
 
+    #Predict every vector from file "Own_predictions.txt" and print them out. 
     Own_prediction_mlp = MLPRegressor([int(inp1)]*int(inp2), max_iter= 100000, random_state=42).fit(X_train, y_train)
 
     for line in np.loadtxt("Own_prediction.txt", dtype=float):

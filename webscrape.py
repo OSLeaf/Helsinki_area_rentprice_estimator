@@ -3,7 +3,7 @@ import requests
 import time
 import googlemaps
 from datetime import date
-from googleAPI import API_KEY
+from googleAPI import API_KEY #Needs a file with variable API_KEY. 
 from csv import writer
 
 start_time = time.time()
@@ -22,8 +22,6 @@ for i in range(1,215):
     address = soup.find('span', class_="address").text
     links += soup.find_all('a', class_="list-item-link")
 
-print(len(links))
-print(len(set(links)))
 links = list(set(links))
 #Make and write to csv file
 with open('Vuokraovi.csv', 'w', encoding= 'utf8', newline='') as f:
