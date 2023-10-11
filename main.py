@@ -12,7 +12,7 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.decomposition import PCA
 
 #Import the Preprosessing file
-from Preprosessing import get_train_test_vald, transfrom_user_input
+from preprosessing import get_train_test_vald, transfrom_user_input
 
 #Get features and labels
 X_train, y_train, X_test, y_test, X_val, y_val = get_train_test_vald()
